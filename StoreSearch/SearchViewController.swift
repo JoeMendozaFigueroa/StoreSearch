@@ -40,25 +40,77 @@ class SearchViewController: UIViewController {
             static let nothingFoundCell = "NothingFoundCell"
         }
     }
-
+    
+    //This method is for the pop-up alert screen when there's no connection to the iTunes Store
+    func showNetworkError() {
+        let alert = UIAlertController(
+            title: "Whoops...",
+            message: "There was an error accessing the iTunes Store." +
+            "Please try again.",
+            preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    //MARK: - HELPER METHODS
+    //This method reads from the ITunes URL
+    func iTunesURL(searchText: String) -> URL {
+        let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
+        let urlString = String(format: "https://itunes.apple.com/search?term=%@", encodedText)
+        let url = URL(string: urlString)
+        return url!
+    }
+    
+    //This method reads out the contents of the ITune URL
+    func performStoreRequest(with url: URL) -> Data? {
+        do {
+            return try Data(contentsOf: url)
+        } catch {
+            print("Download Error: \(error.localizedDescription)")
+            
+            showNetworkError()
+            return nil
+        }
+    }
+    
+    func parse(data: Data) -> [SearchResult] {
+        do {
+            let decoder = JSONDecoder()
+            let result = try decoder.decode(
+                ResultArray.self, from: data)
+            return result.results
+        } catch {
+            print("JSON Error: \(error)")
+            return []
+        }
+    }
 }
 //MARK: - SEARCH BAR DELEGATE
 extension SearchViewController: UISearchBarDelegate {
+    
     //This method shows the results from the search bar into the Table View Cell
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
-        searchResults = []
-        if searchBar.text! != "Justin Bieber" {
-        for i in 0...2 {
-            let searchResult = SearchResult()
-            searchResult.name = String( format: "Fake Result %d for", i)
-                searchResult.artistName = searchBar.text!
-                searchResults.append(searchResult)
+        if !searchBar.text!.isEmpty {
+            searchBar.resignFirstResponder()
+            
+            hasSearched = true
+            searchResults = []
+
+            let url = iTunesURL(searchText: searchBar.text!)
+            print("URL: '\(url)'")
+            
+            if let data = performStoreRequest(with: url) {
+                searchResults = parse(data: data)
+                
+                //This sorts the items in alphabeticall order
+                searchResults.sort(by: <)
+            }
+            tableView.reloadData()
         }
+
     }
-        hasSearched = true
-        tableView.reloadData()
-    }
+    
     //This method extends the layout of the search bar to the top
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         return .topAttached
@@ -88,7 +140,13 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
             
             let searchResult = searchResults[indexPath.row]
             cell.nameLabel.text = searchResult.name
-            cell.artistNameLabel.text = searchResult.artistName
+            if searchResult.artist.isEmpty {
+                cell.artistNameLabel.text = "Unknown"
+            } else { //This boolean places the item type next to the Artist Name
+                cell.artistNameLabel.text = String(format: "%@ (%@)",
+                                                   searchResult.artist,
+                                                   searchResult.type)
+            }
             return cell
         }
     }
@@ -97,6 +155,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if searchResults.count == 0 {
             return nil
