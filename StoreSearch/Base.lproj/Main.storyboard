@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <device id="retina4_7" orientation="portrait" appearance="dark"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -15,9 +15,39 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="interactive" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Irr-Uo-cQP">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="HOv-5H-7HB"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="QqT-KF-iBh"/>
+                                </connections>
+                            </tableView>
+                            <searchBar contentMode="redraw" placeholder="App name, artist, song, album, e-book" translatesAutoresizingMaskIntoConstraints="NO" id="mP2-fC-zlv">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="d5o-Qp-Whd"/>
+                                </connections>
+                            </searchBar>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="mP2-fC-zlv" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="6oC-LL-4RO"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Irr-Uo-cQP" secondAttribute="bottom" id="CUV-Dm-DHu"/>
+                            <constraint firstItem="Irr-Uo-cQP" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="LRt-AP-GcW"/>
+                            <constraint firstItem="mP2-fC-zlv" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="UmZ-8B-5ya"/>
+                            <constraint firstItem="mP2-fC-zlv" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="fjI-RY-2Za"/>
+                            <constraint firstItem="Irr-Uo-cQP" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="fno-up-lKr"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Irr-Uo-cQP" secondAttribute="trailing" id="wp2-ev-ELg"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="searchBar" destination="mP2-fC-zlv" id="le9-ZT-Rfy"/>
+                        <outlet property="tableView" destination="Irr-Uo-cQP" id="USS-Ak-IIp"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
