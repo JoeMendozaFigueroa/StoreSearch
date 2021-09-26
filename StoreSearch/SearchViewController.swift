@@ -147,7 +147,6 @@ extension SearchViewController: UISearchBarDelegate {
     }
 }
 
-
 //MARK: - TABLE VIEW DELEGATE
 //This method will handle all the tableView delegate methods
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {

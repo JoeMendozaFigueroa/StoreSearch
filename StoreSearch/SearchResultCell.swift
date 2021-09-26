@@ -13,6 +13,8 @@ class SearchResultCell: UITableViewCell {
     @IBOutlet var artistNameLabel: UILabel!
     @IBOutlet var artworkImageView: UIImageView!
     
+    var downloadTask: URLSessionDownloadTask?
+    
     //This method is the structure and look for the cell
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -27,6 +29,13 @@ class SearchResultCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
+    //This method cancels any image that is still downloading
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        downloadTask?.cancel()
+        downloadTask = nil
+        print("This Works!!")
+    }
     
     //MARK: - HELPER METHODS
     func configure(for result: SearchResult) {
@@ -35,6 +44,11 @@ class SearchResultCell: UITableViewCell {
             artistNameLabel.text = "Unknonw"
         } else {
             artistNameLabel.text = String(format: "%@ (%@)", result.artist, result.type)
+        }
+        //This loads an image into the "artworkImageView" object
+        artworkImageView.image = UIImage(systemName: "square")
+        if let smallURL = URL(string: result.imageSmall) {
+            downloadTask = artworkImageView.loadImage(url: smallURL)
         }
     }
 
