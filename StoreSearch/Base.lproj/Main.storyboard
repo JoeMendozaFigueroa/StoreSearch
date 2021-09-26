@@ -25,6 +25,26 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="QqT-KF-iBh"/>
                                 </connections>
                             </tableView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BuS-qJ-68v">
+                                <rect key="frame" x="0.0" y="56" width="375" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" id="Q4S-2b-Lfo">
+                                        <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="JYF-tj-8U1">
+                                            <rect key="frame" x="16" y="5.5" width="343" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <segments>
+                                                <segment title="All"/>
+                                                <segment title="Music"/>
+                                                <segment title="Software"/>
+                                                <segment title="E-books"/>
+                                            </segments>
+                                            <connections>
+                                                <action selector="segmentChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="Uw8-dm-wBL"/>
+                                            </connections>
+                                        </segmentedControl>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                             <searchBar contentMode="redraw" placeholder="App name, artist, song, album, e-book" translatesAutoresizingMaskIntoConstraints="NO" id="mP2-fC-zlv">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
                                 <color key="barTintColor" name="SearchBar"/>
@@ -39,15 +59,19 @@
                         <constraints>
                             <constraint firstItem="mP2-fC-zlv" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="6oC-LL-4RO"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Irr-Uo-cQP" secondAttribute="bottom" id="CUV-Dm-DHu"/>
+                            <constraint firstItem="BuS-qJ-68v" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="DbN-ba-08Q"/>
                             <constraint firstItem="Irr-Uo-cQP" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="LRt-AP-GcW"/>
+                            <constraint firstItem="BuS-qJ-68v" firstAttribute="top" secondItem="mP2-fC-zlv" secondAttribute="bottom" id="RNB-q0-bHE"/>
                             <constraint firstItem="mP2-fC-zlv" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="UmZ-8B-5ya"/>
                             <constraint firstItem="mP2-fC-zlv" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="fjI-RY-2Za"/>
                             <constraint firstItem="Irr-Uo-cQP" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="fno-up-lKr"/>
+                            <constraint firstItem="BuS-qJ-68v" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="j4d-0A-x2M"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Irr-Uo-cQP" secondAttribute="trailing" id="wp2-ev-ELg"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="searchBar" destination="mP2-fC-zlv" id="le9-ZT-Rfy"/>
+                        <outlet property="segmentedControl" destination="JYF-tj-8U1" id="uys-Fa-qN2"/>
                         <outlet property="tableView" destination="Irr-Uo-cQP" id="USS-Ak-IIp"/>
                     </connections>
                 </viewController>
