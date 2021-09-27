@@ -11,7 +11,7 @@ class ResultArray: Codable {
     var resultCount = 0
     var results = [SearchResult]()
 }
-//This class is to identify the items inside the web search json file
+//This class is to identify the items from the web search information
 class SearchResult: Codable, CustomStringConvertible {
     var artistName: String? = ""
     var trackName: String? = ""
@@ -29,6 +29,7 @@ class SearchResult: Codable, CustomStringConvertible {
     var itemGenre: String?
     var bookGenre: [String]?
     
+    //This enum method is for the various variables that are read when the URL is found
     enum CodingKeys: String, CodingKey {
         case imageSmall = "artworkUrl60"
         case imageLarge = "artworkUrl100"
@@ -39,19 +40,19 @@ class SearchResult: Codable, CustomStringConvertible {
         case trackName, trackPrice, trackViewUrl
         case collectionName, collectionViewUrl, collectionPrice
     }
-    
+    //This variable is for the trackname
     var name: String {
         return trackName ?? collectionName ?? ""
     }
-    
+    //This variable is for the track title
     var storeURL: String {
         return trackViewUrl ?? collectionViewUrl ?? ""
     }
-    
+    //This variable is for the price of the item
     var price: Double {
         return trackPrice ?? collectionPrice ?? itemPrice ?? 0.0
     }
-    
+    //This varibale is for the Genre information
     var genre: String {
         if let genre = itemGenre {
             return genre
@@ -60,7 +61,7 @@ class SearchResult: Codable, CustomStringConvertible {
         }
         return ""
     }
-    
+    //This variable is the list of items that will be gathered from the network
     var type: String {
         let kind = self.kind ?? "audiobook"
         switch kind {
@@ -78,11 +79,11 @@ class SearchResult: Codable, CustomStringConvertible {
         }
         return "Unknown"
     }
-    
+    //This variable reads the artist name
     var artist: String {
         return artistName ?? ""
     }
-    //This variable reads the contents of the json file and places them into the console as a more readable form
+    //This variable reads the contents from the web and places them into the cell as a more readable form
     var description: String {
         return "\nResult - Kind: \(kind ?? "None"), Name: \(name), ArtistName: \(artistName ?? "None")"
     }

@@ -26,7 +26,7 @@ class SearchViewController: UIViewController {
             static let loadingCell = "LoadingCell"
         }
     }
-
+    //The syntex inside this method is the culmination of all the classes, methods, & variables, that come together to create the Main ViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         

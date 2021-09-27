@@ -7,7 +7,7 @@
 
 import UIKit
 
-//This extension adds the image of the search results into the image icon next the name on the cells
+//This extension adds the image of the search results into the image icon next to the name on the cells
 extension UIImageView {
     func loadImage(url: URL) -> URLSessionDownloadTask {
         let session = URLSession.shared
