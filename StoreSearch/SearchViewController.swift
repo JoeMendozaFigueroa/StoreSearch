@@ -18,7 +18,7 @@ class SearchViewController: UIViewController {
     var isLoading = false
     var dataTask: URLSessionDataTask?
 
-    //This method subtitutes the tableView cell with the custom ".XIB" files
+    //*/This method subtitutes the tableView cell with the custom ".XIB" files*/
     struct TableView {
         struct CellIdentifiers {
             static let searchResultCell = "SearchResultCell"
@@ -26,12 +26,12 @@ class SearchViewController: UIViewController {
             static let loadingCell = "LoadingCell"
         }
     }
-    //The syntex inside this method is the culmination of all the classes, methods, & variables, that come together to create the Main ViewController
+    //*/The syntex inside this method is the culmination of all the classes, methods, & variables, that come together to create the Main ViewController*/
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.contentInset = UIEdgeInsets(top: 94,left: 0,bottom: 0,right: 0)
-        //This local constant loads the "Search Result Cell" view
+        //*/This local constant loads the "Search Result Cell" view*/
         var cellNib = UINib(nibName: TableView.CellIdentifiers.searchResultCell, bundle: nil)
         tableView.register(cellNib, forCellReuseIdentifier: TableView.CellIdentifiers.searchResultCell)
         
@@ -49,7 +49,7 @@ class SearchViewController: UIViewController {
         performSearch()
     }
     //MARK: - HELPER METHODS
-    //This method reads from the ITunes URL
+    //*/This method reads from the ITunes URL*/
     func iTunesURL(searchText: String, category: Int) -> URL {
         let kind: String
         switch category {
@@ -77,7 +77,7 @@ class SearchViewController: UIViewController {
         }
     }
     
-    //This method is for the pop-up alert screen when there's no connection to the iTunes Store
+    //*/This method is for the pop-up alert screen when there's no connection to the iTunes Store*/
     func showNetworkError() {
         let alert = UIAlertController(
             title: "Whoops...",
@@ -89,6 +89,21 @@ class SearchViewController: UIViewController {
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
+    
+    //MARK: - NAVIGATION
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowDetail" {
+            //These constants populate the labels wit the information from the URL search
+            let detailViewController = segue.destination as! DetailViewController
+            let indexPath = sender as! IndexPath
+            let searchResult = searchResults[indexPath.row]
+            detailViewController.searchResult = searchResult
+            
+            segue.destination.modalPresentationStyle = .overFullScreen
+        }
+    }
+    
+
 }
 //MARK: - SEARCH BAR DELEGATE
 extension SearchViewController: UISearchBarDelegate {
@@ -97,7 +112,7 @@ extension SearchViewController: UISearchBarDelegate {
         performSearch()
     }
     
-    //This method shows the results from the search bar into the Table View Cell
+    //*/This method shows the results from the search bar into the Table View Cell*/
     func performSearch() {
         if !searchBar.text!.isEmpty {
             searchBar.resignFirstResponder()
@@ -141,14 +156,15 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     
-    //This method extends the layout of the search bar to the top
+    //*/This method extends the layout of the search bar to the top*/
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         return .topAttached
     }
+    
 }
 
 //MARK: - TABLE VIEW DELEGATE
-//This method will handle all the tableView delegate methods
+//*/This method will handle all the tableView delegate methods*/
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isLoading {
@@ -162,7 +178,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    //This method enters the text inside the cells
+    //*/This method enters the text inside the cells*/
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isLoading {
             let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.loadingCell, for: indexPath)
@@ -181,9 +197,11 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    // LOOK AT THE NOTES FROM PREVIOUS PROJECTS FOR THE BOTTOM METHODS
+    //This methods occurs when a user selects on a row.
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        //Added following
+        performSegue(withIdentifier: "ShowDetail", sender: indexPath)
     }
     
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
