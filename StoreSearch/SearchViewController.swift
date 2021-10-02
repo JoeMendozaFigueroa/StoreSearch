@@ -99,7 +99,7 @@ class SearchViewController: UIViewController {
         landscapeVC = storyboard!.instantiateViewController(withIdentifier: "LandscapeViewController") as?
         LandscapeViewController
         if let controller = landscapeVC {
-            //3
+            controller.searchResults = searchResults
             controller.view.frame = view.bounds
             controller.view.alpha = 0
             //4

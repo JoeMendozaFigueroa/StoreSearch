@@ -228,20 +228,30 @@
                         <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="WE'RE IN LANDSCAPE" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oQa-hc-HIR">
-                                <rect key="frame" x="247" y="177" width="173" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" pagingEnabled="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aRb-9B-CGj">
+                                <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <viewLayoutGuide key="contentLayoutGuide" id="u8V-F6-0Vo"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="IHH-7X-OVb"/>
+                                <connections>
+                                    <outlet property="delegate" destination="F0N-gh-xcG" id="u61-qK-KmY"/>
+                                </connections>
+                            </scrollView>
+                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" id="wEX-BV-xuv">
+                                <rect key="frame" x="272" y="173" width="123" height="28"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="pageChanged:" destination="F0N-gh-xcG" eventType="valueChanged" id="AZQ-sg-MSR"/>
+                                </connections>
+                            </pageControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Cqb-AG-hHg"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="oQa-hc-HIR" firstAttribute="centerX" secondItem="HWS-5d-uME" secondAttribute="centerX" id="56E-c5-zcm"/>
-                            <constraint firstItem="oQa-hc-HIR" firstAttribute="centerY" secondItem="HWS-5d-uME" secondAttribute="centerY" id="ixf-Xf-x9r"/>
-                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="pageControl" destination="wEX-BV-xuv" id="1wb-qf-sJb"/>
+                        <outlet property="scrollView" destination="aRb-9B-CGj" id="kNZ-6S-CGS"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Xw4-xP-Xom" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

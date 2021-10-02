@@ -35,7 +35,7 @@ class SearchResultCell: UITableViewCell {
         super.prepareForReuse()
         downloadTask?.cancel()
         downloadTask = nil
-        print("This Works!!")
+        //print("This Works!!")
     }
     
     //MARK: - HELPER METHODS
