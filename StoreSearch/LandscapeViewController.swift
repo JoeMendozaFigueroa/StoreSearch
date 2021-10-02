@@ -14,6 +14,7 @@ class LandscapeViewController: UIViewController {
     
     var searchResults = [SearchResult]()
     private var firstTime = true
+    private var downloads = [URLSessionDownloadTask]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +67,7 @@ class LandscapeViewController: UIViewController {
             },
         completion: nil)
     }
+    
     //MARK: - PRIVATE METHODS
     //This method is for the layout of the buttons
     private func tileButtons(_ searchResults: [SearchResult]) {
@@ -96,9 +98,8 @@ class LandscapeViewController: UIViewController {
         var x = marginX
         for (index, result) in searchResults.enumerated() {
             //1
-            let button = UIButton(type: .system)
-            button.backgroundColor = UIColor.white
-            button.setTitle("\(index)", for: .normal)
+            let button = UIButton(type: .custom)
+            button.setBackgroundImage(UIImage(named: "LandscapeButton"), for: .normal)
             //2
             button.frame = CGRect(
                 x: x + paddingHorz,
@@ -115,6 +116,8 @@ class LandscapeViewController: UIViewController {
                     column = 0; x += marginX * 2
                 }
             }
+            downloadImage(for: result, andPlaceOn: button)
+
         }
         
         //SET SCROLL VIEW CONTENT SIZE
@@ -127,6 +130,34 @@ class LandscapeViewController: UIViewController {
         pageControl.currentPage = 0
         
         print("Number of pages: \(numPages)")
+    }
+    
+    private func downloadImage(
+        for searchResult: SearchResult, andPlaceOn button: UIButton) {
+        if let url = URL(string: searchResult.imageSmall) {
+            let task = URLSession.shared.downloadTask(with: url) {
+                [weak button] url, _, error in
+                if error == nil, let url = url,
+                   let data = try? Data(contentsOf: url),
+                   let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        if let button = button {
+                        button.setImage(image, for: .normal)
+                    }
+                }
+            }
+        }
+        task.resume()
+        downloads.append(task)
+
+        }
+    }
+    
+    deinit {
+        print("deinit \(self)")
+        for task in downloads {
+            task.cancel()
+        }
     }
 
 }
