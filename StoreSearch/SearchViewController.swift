@@ -17,6 +17,7 @@ class SearchViewController: UIViewController {
     var hasSearched = false
     var isLoading = false
     var dataTask: URLSessionDataTask?
+    var landscapeVC: LandscapeViewController?
 
     //*/This method subtitutes the tableView cell with the custom ".XIB" files*/
     struct TableView {
@@ -90,6 +91,41 @@ class SearchViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    //This method occurs when user places phone into Landscape mode & Landscape view controller appears
+    func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        //1
+        guard landscapeVC == nil else { return }
+        //2
+        landscapeVC = storyboard!.instantiateViewController(withIdentifier: "LandscapeViewController") as?
+        LandscapeViewController
+        if let controller = landscapeVC {
+            //3
+            controller.view.frame = view.bounds
+            controller.view.alpha = 0
+            //4
+            view.addSubview(controller.view)
+            addChild(controller)
+            coordinator.animate(alongsideTransition: {_ in controller.view.alpha = 1
+                self.searchBar.resignFirstResponder() //This syntax hides the keyboard, when useer rotates device
+                if self.presentedViewController != nil {
+                    self.dismiss(animated: true, completion: nil)
+                }
+            }, completion: {_ in controller.didMove(toParent: self)
+                
+            })
+        }
+    }
+    //This method occurs when user places phone back to vertical mode & Landscape view controller disappears
+    func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        if let controller = landscapeVC {
+            controller.willMove(toParent: nil)
+            coordinator.animate(alongsideTransition: {_ in controller.view.alpha = 0}, completion: {_ in controller.view.removeFromSuperview()
+                controller.removeFromParent()
+                self.landscapeVC = nil
+            })
+        }
+    }
+    
     //MARK: - NAVIGATION
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDetail" {
@@ -100,6 +136,19 @@ class SearchViewController: UIViewController {
             detailViewController.searchResult = searchResult
             
             segue.destination.modalPresentationStyle = .overFullScreen
+        }
+    }
+    
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+        
+        switch newCollection.verticalSizeClass {
+        case .compact:
+            showLandscape(with: coordinator)
+        case .regular, .unspecified:
+            hideLandscape(with: coordinator)
+        @unknown default:
+            break
         }
     }
     

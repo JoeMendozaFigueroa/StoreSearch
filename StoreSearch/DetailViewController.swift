@@ -19,6 +19,7 @@ class DetailViewController: UIViewController {
     
     var searchResult: SearchResult!
     var downloadTask: URLSessionDownloadTask?
+    var dismissStyle = AnimationStyle.fade
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +45,7 @@ class DetailViewController: UIViewController {
     
     // MARK: - ACTIONS
     @IBAction func close() {
+        dismissStyle = .slide
         dismiss(animated: true, completion: nil)
     }
     
@@ -100,6 +102,11 @@ class DetailViewController: UIViewController {
         super.init(coder: aDecoder)
         transitioningDelegate = self
     }
+    
+    enum AnimationStyle {
+        case slide
+        case fade
+    }
 
 }
 //This extension is of the Gesture Class, for when a user touches the screen
@@ -118,6 +125,11 @@ extension DetailViewController: UIViewControllerTransitioningDelegate {
     }
     //This method overrides the bounce animation and initiates the slideOut animation
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return SlideOutAnimationController()
+        switch dismissStyle {
+        case .slide:
+            return SlideOutAnimationController()
+        case .fade:
+            return SlideOutAnimationController()
+        }
     }
 }
