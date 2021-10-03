@@ -50,12 +50,13 @@ class SearchViewController: UIViewController {
     //*/This method is for the pop-up alert screen when there's no connection to the iTunes Store*/
     func showNetworkError() {
         let alert = UIAlertController(
-            title: "Whoops...",
-            message: "There was an error accessing the iTunes Store." +
-            "Please try again.",
+            title: NSLocalizedString("Whoops...", comment: "Error alert: title"),
+            message: NSLocalizedString("There was an error accessing the iTunes Store. Please try again.", comment: "Error alert: message"),
             preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        let action = UIAlertAction(title: NSLocalizedString("OK", comment: "Localized kind: OK"),
+                                   style: .default,
+                                   handler: nil)
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
