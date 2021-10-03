@@ -15,6 +15,8 @@ class SearchViewController: UIViewController {
     
     private let search = Search()
     var landscapeVC: LandscapeViewController?
+    
+    weak var splitViewDetail: DetailViewController?
 
     //*/This method subtitutes the tableView cell with the custom ".XIB" files*/
     struct TableView {
@@ -38,8 +40,12 @@ class SearchViewController: UIViewController {
         
         cellNib = UINib(nibName: TableView.CellIdentifiers.loadingCell, bundle: nil)
         tableView.register(cellNib,forCellReuseIdentifier: TableView.CellIdentifiers.loadingCell)
-
-        searchBar.becomeFirstResponder()
+        
+        if UIDevice.current.userInterfaceIdiom != .pad {
+            searchBar.becomeFirstResponder()
+        }
+        
+        title = NSLocalizedString("Search", comment: "split view primary button")
     }
     
     //MARK: - ACTIONS
@@ -100,6 +106,16 @@ class SearchViewController: UIViewController {
         }
     }
     
+    
+    //This method hides the split view controller
+    private func hidePrimaryPane() {
+        UIView.animate(withDuration: 0.25, animations: {
+            self.splitViewController!.preferredDisplayMode = .secondaryOnly
+        }, completion: {_ in self.splitViewController!.preferredDisplayMode = .automatic
+            }
+        )
+    }
+    
     //MARK: - NAVIGATION
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDetail" {
@@ -110,10 +126,12 @@ class SearchViewController: UIViewController {
                 let indexPath = sender  as! IndexPath
                 let searchResult = list[indexPath.row]
                 detailViewController.searchResult = searchResult
+                detailViewController.isPopup = true
             }
         }
     }
     
+    //This method is the transition for when you flip to landscape mode
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
         super.willTransition(to: newCollection, with: coordinator)
         
@@ -127,6 +145,13 @@ class SearchViewController: UIViewController {
         }
     }
     
+    //This method will hide the navigation bar on the iPhone
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            navigationController?.navigationBar.isHidden = true
+        }
+    }
 
 }
 //MARK: - SEARCH BAR DELEGATE
@@ -208,9 +233,20 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     //This methods occurs when a user selects on a row.
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        //Added following
-        performSegue(withIdentifier: "ShowDetail", sender: indexPath)
+        searchBar.resignFirstResponder()
+        
+        if view.window!.rootViewController!.traitCollection
+            .horizontalSizeClass == .compact {
+            tableView.deselectRow(at: indexPath, animated: true)
+            performSegue(withIdentifier: "ShowDetail", sender: indexPath)
+        } else {
+            if case .results(let list) = search.state {
+                splitViewDetail?.searchResult = list [indexPath.row]
+            }
+            if splitViewController!.displayMode != .oneBesideSecondary {
+                hidePrimaryPane()
+            }
+        }
     }
     //This method is on standby for when a user selects a row
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {

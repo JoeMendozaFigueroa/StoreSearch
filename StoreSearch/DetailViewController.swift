@@ -17,30 +17,43 @@ class DetailViewController: UIViewController {
     @IBOutlet var genreLabel: UILabel!
     @IBOutlet var priceButton: UIButton!
     
-    var searchResult: SearchResult!
+    var searchResult: SearchResult! {
+        didSet {
+            if isViewLoaded {
+                updateUI()
+            }
+        }
+    }
     var downloadTask: URLSessionDownloadTask?
     var dismissStyle = AnimationStyle.fade
+    var isPopup = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        popupView.layer.cornerRadius = 25 // This makes the edges of the pop-up view rounded with a radius of 10 Degrees
-        
-        //This constant is for when a user touches outside of the Pop-Up View, it exits out of it
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(close))
-        gestureRecognizer.cancelsTouchesInView = false
-        gestureRecognizer.delegate = self
-        view.addGestureRecognizer(gestureRecognizer)
-        
+        if isPopup {
+            popupView.layer.cornerRadius = 10 // This makes the edges of the pop-up view rounded with a radius of 10 Degrees
+
+            //This constant is for when a user touches outside of the Pop-Up View, it exits out of it
+            let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(close))
+            gestureRecognizer.cancelsTouchesInView = false
+            gestureRecognizer.delegate = self
+            view.addGestureRecognizer(gestureRecognizer)
+            
+            //This reveals the GRADIENT VIEW
+            view.backgroundColor = UIColor.clear
+            let dimmingView = GradientView(frame: CGRect.zero)
+            dimmingView.frame = view.bounds
+            view.insertSubview(dimmingView, at: 0)
+        } else {
+            if let displayName = Bundle.main.localizedInfoDictionary?["CFBundleDisplayName"] as? String {
+                title = displayName
+            }
+            view.backgroundColor = UIColor(patternImage: UIImage(named: "LandscapeBackground")!)
+            popupView.isHidden = true
+        }
         if searchResult != nil {
             updateUI()
         }
-        
-        //This reveals the GRADIENT VIEW
-        view.backgroundColor = UIColor.clear
-        let dimmingView = GradientView(frame: CGRect.zero)
-        dimmingView.frame = view.bounds
-        view.insertSubview(dimmingView, at: 0)
-
     }
     
     // MARK: - ACTIONS
@@ -89,6 +102,7 @@ class DetailViewController: UIViewController {
         if let largeURL = URL(string: searchResult.imageLarge) {
             downloadTask = artworkImageView.loadImage(url: largeURL)
         }
+        popupView.isHidden = false
     }
     
     //This is called whenever the object instance is deallocated and its memory is reclaimed
