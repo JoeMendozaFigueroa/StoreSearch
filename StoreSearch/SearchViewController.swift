@@ -88,7 +88,11 @@ class SearchViewController: UIViewController {
     func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         if let controller = landscapeVC {
             controller.willMove(toParent: nil)
-            coordinator.animate(alongsideTransition: {_ in controller.view.alpha = 0}, completion: {_ in controller.view.removeFromSuperview()
+            coordinator.animate(alongsideTransition: {_ in controller.view.alpha = 0}, completion: {_ in
+                if self.presentedViewController != nil {
+                    self.dismiss(animated: true, completion: nil)
+                }
+                controller.view.removeFromSuperview()
                 controller.removeFromParent()
                 self.landscapeVC = nil
             })
@@ -146,6 +150,7 @@ extension SearchViewController: UISearchBarDelegate {
         
         tableView.reloadData()
         searchBar.resignFirstResponder()
+        self.landscapeVC?.searchResultsReceived()
     }
     
     

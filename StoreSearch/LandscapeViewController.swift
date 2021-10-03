@@ -38,7 +38,8 @@ class LandscapeViewController: UIViewController {
         pageControl.numberOfPages = 0
 
     }
-//This method is to override iOS Layout Subview, to allow you to create your own layout
+    
+    //This method is to override iOS Layout Subview, to allow you to create your own layout
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         let safeFrame = view.safeAreaLayoutGuide.layoutFrame
@@ -53,8 +54,10 @@ class LandscapeViewController: UIViewController {
             firstTime = false
             
             switch search.state {
-            case .notSearchedYet, .loading, .noResults:
+            case .notSearchedYet, .loading:
                 break
+            case .noResults:
+                showNothingFoundLabel()
             case .results(let list):
                 tileButtons(list)
             }
@@ -75,8 +78,24 @@ class LandscapeViewController: UIViewController {
         completion: nil)
     }
     
+    //This method show the detail view controlelr
+    @objc func buttonPressed(_ sender: UIButton) {
+        performSegue(withIdentifier: "ShowDetail", sender: sender)
+    }
+    
+    //MARK: - NAVIGATION
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowDetail" {
+            if case .results(let list) = search.state {
+                let detailViewController = segue.destination as!
+                DetailViewController
+                let searchResult = list[(sender as! UIButton).tag - 2000]
+                detailViewController.searchResult = searchResult
+            }
+        }
+    }
     //MARK: - PRIVATE METHODS
-    //This method is for the layout of the buttons
+    //This method is for the design and layout of the buttons
     private func tileButtons(_ searchResults: [SearchResult]) {
         let itemWidth: CGFloat = 94
         let itemHeight: CGFloat = 88
@@ -106,6 +125,10 @@ class LandscapeViewController: UIViewController {
         for (index, result) in searchResults.enumerated() {
             //1
             let button = UIButton(type: .custom)
+            button.tag = 2000 + index
+            button.addTarget(
+            self,
+                action: #selector(buttonPressed), for: .touchUpInside)
             button.setBackgroundImage(UIImage(named: "LandscapeButton"), for: .normal)
             //2
             button.frame = CGRect(
@@ -139,6 +162,7 @@ class LandscapeViewController: UIViewController {
         print("Number of pages: \(numPages)")
     }
     
+    //This method downloads the image from the URL Search, to populate the "LandscapeButton"
     private func downloadImage(
         for searchResult: SearchResult, andPlaceOn button: UIButton) {
         if let url = URL(string: searchResult.imageSmall) {
@@ -160,15 +184,64 @@ class LandscapeViewController: UIViewController {
         }
     }
     
+    //This method shows the spinner icon "searching" in landscape mode
+    private func showSpinner() {
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.center = CGPoint(
+            x: scrollView.bounds.midX + 0.5,
+            y: scrollView.bounds.midY + 0.5)
+        spinner.tag = 1000
+        view.addSubview(spinner)
+        spinner.startAnimating()
+    }
+    
+    //This method is for when a users search results in nothing
+    private func showNothingFoundLabel() {
+        let label = UILabel(frame: CGRect.zero)
+        label.text = "Nothing Found!"
+        label.textColor = UIColor.label
+        label.backgroundColor = UIColor.clear
+        
+        label.sizeToFit()
+        
+        var rect = label.frame
+        rect.size.width = ceil(rect.size.width / 2) * 2 //MAKE EVEN
+        rect.size.height = ceil(rect.size.height / 2) * 2 //MAKE EVEN
+        label.frame = rect
+        
+        label.center = CGPoint(
+            x: scrollView.bounds.midX,
+            y: scrollView.bounds.midY)
+        view.addSubview(label)
+    }
+    
     deinit {
         print("deinit \(self)")
         for task in downloads {
             task.cancel()
         }
     }
+    
+    //MARK: - HELPER METHODS
+    func searchResultsReceived() {
+        hideSpinner()
+        
+        switch search.state {
+        case .notSearchedYet, .loading, .noResults:
+            break
+        case .results(let list):
+            tileButtons(list)
+        }
+    }
+    
+    //This method hides the spinner icon
+    private func hideSpinner() {
+        view.viewWithTag(1000)?.removeFromSuperview()
+    }
 
 }
 extension LandscapeViewController: UIScrollViewDelegate {
+    //This method is for the scrolling area
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let width = scrollView.bounds.size.width
         let page = Int((scrollView.contentOffset.x + width / 2) / width)
