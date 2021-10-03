@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MessageUI //This is to import the MFMailComposeViewController framework to send an email
 
 class DetailViewController: UIViewController {
 
@@ -17,6 +18,15 @@ class DetailViewController: UIViewController {
     @IBOutlet var genreLabel: UILabel!
     @IBOutlet var priceButton: UIButton!
     
+    enum AnimationStyle {
+        case slide
+        case fade
+    }
+    
+    var downloadTask: URLSessionDownloadTask?
+    var dismissStyle = AnimationStyle.fade
+    var isPopup = false
+    
     var searchResult: SearchResult! {
         didSet {
             if isViewLoaded {
@@ -24,9 +34,11 @@ class DetailViewController: UIViewController {
             }
         }
     }
-    var downloadTask: URLSessionDownloadTask?
-    var dismissStyle = AnimationStyle.fade
-    var isPopup = false
+    //This init method is called when the animation is needed
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        transitioningDelegate = self
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,15 +57,23 @@ class DetailViewController: UIViewController {
             dimmingView.frame = view.bounds
             view.insertSubview(dimmingView, at: 0)
         } else {
+            view.backgroundColor = UIColor(patternImage: UIImage(named: "LandscapeBackground")!)
+            popupView.isHidden = true
+            
             if let displayName = Bundle.main.localizedInfoDictionary?["CFBundleDisplayName"] as? String {
                 title = displayName
             }
-            view.backgroundColor = UIColor(patternImage: UIImage(named: "LandscapeBackground")!)
-            popupView.isHidden = true
+            //POPOVER ACTION BUTTON
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(showPopover(_:)))
         }
         if searchResult != nil {
             updateUI()
         }
+    }
+    //This is called whenever the object instance is deallocated and its memory is reclaimed
+    deinit {
+        print("deinit \(self)")
+        downloadTask?.cancel()
     }
     
     // MARK: - ACTIONS
@@ -62,10 +82,24 @@ class DetailViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    //This method takes you to the store once you select the price label
     @IBAction func openInStore() {
         if let url = URL(string: searchResult.storeURL) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
+    }
+    
+    //This method shows the menu icon and calls for the Popover View Controller
+    @objc func showPopover(_ sender: UIBarButtonItem) {
+        guard let popover = storyboard?.instantiateViewController(
+                withIdentifier: "PopoverView") as? MenuViewController
+        else {return}
+        popover.modalPresentationStyle = .popover
+        if let ppc = popover.popoverPresentationController {
+            ppc.barButtonItem = sender
+        }
+        popover.delegate = self
+        present(popover, animated: true, completion: nil)
     }
     
     //MARK: - HELPER METHODS
@@ -105,23 +139,6 @@ class DetailViewController: UIViewController {
         popupView.isHidden = false
     }
     
-    //This is called whenever the object instance is deallocated and its memory is reclaimed
-    deinit {
-        print("deinit \(self)")
-        downloadTask?.cancel()
-    }
-    
-    //This init method is called when the animation is needed
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        transitioningDelegate = self
-    }
-    
-    enum AnimationStyle {
-        case slide
-        case fade
-    }
-
 }
 //This extension is of the Gesture Class, for when a user touches the screen
 extension DetailViewController: UIGestureRecognizerDelegate {
@@ -130,14 +147,14 @@ extension DetailViewController: UIGestureRecognizerDelegate {
     }
 }
 extension DetailViewController: UIViewControllerTransitioningDelegate {
-    //This method activates the bounce animation Class
+    //This method activates the bounce animation when view first appears
     func animationController(
         forPresented presented: UIViewController,
         presenting: UIViewController,
         source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return BounceAnimationController()
     }
-    //This method overrides the bounce animation and initiates the slideOut animation
+    //This method overrides the bounce animation and initiates the slideOut animation when you exit the view
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         switch dismissStyle {
         case .slide:
@@ -145,5 +162,29 @@ extension DetailViewController: UIViewControllerTransitioningDelegate {
         case .fade:
             return SlideOutAnimationController()
         }
+    }
+}
+//This method dismisses the popover view controller and opens up for the useer to send an email (only in ipad mode)
+extension DetailViewController: MenuViewControllerDelegate {
+    func menuViewControllerSendEmail(_ : MenuViewController) {
+        dismiss(animated: true) {
+            if MFMailComposeViewController.canSendMail() {
+                let controller = MFMailComposeViewController()
+                controller.setSubject(NSLocalizedString("Support Request", comment: "Email subject"))
+                controller.setToRecipients(["your@email-address-here.com"])
+                self.present(controller, animated: true, completion: nil)
+                controller.mailComposeDelegate = self
+            }
+        }
+    }
+}
+
+//This method lets you know wether the email was sent or not
+extension DetailViewController: MFMailComposeViewControllerDelegate {
+    func mailComposeController (_ controller: MFMailComposeViewController,
+                                didFinishWith result: MFMailComposeResult,
+                                error: Error?) {
+            dismiss(animated: true, completion: nil
+            )
     }
 }

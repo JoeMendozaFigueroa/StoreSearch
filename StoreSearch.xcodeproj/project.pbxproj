@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D28B7B8270A6BA600122648 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D28B7B7270A6BA600122648 /* MenuViewController.swift */; };
 		1D44BAD42708BB8D00B9F56F /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D44BAD32708BB8D00B9F56F /* GradientView.swift */; };
 		1D44BAD72708C2FD00B9F56F /* BounceAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D44BAD62708C2FD00B9F56F /* BounceAnimationController.swift */; };
 		1D44BADB2708C92700B9F56F /* SlideOutAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D44BADA2708C92700B9F56F /* SlideOutAnimationController.swift */; };
@@ -30,6 +31,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1D28B7B7270A6BA600122648 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		1D44BAD32708BB8D00B9F56F /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		1D44BAD62708C2FD00B9F56F /* BounceAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceAnimationController.swift; sourceTree = "<group>"; };
 		1D44BADA2708C92700B9F56F /* SlideOutAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOutAnimationController.swift; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 		1D70441326FEA86300FFD44F = {
 			isa = PBXGroup;
 			children = (
+				1D28B7B7270A6BA600122648 /* MenuViewController.swift */,
 				1D70441E26FEA86400FFD44F /* StoreSearch */,
 				1D70441D26FEA86400FFD44F /* Products */,
 			);
@@ -188,6 +191,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D70442426FEA86400FFD44F /* SearchViewController.swift in Sources */,
+				1D28B7B8270A6BA600122648 /* MenuViewController.swift in Sources */,
 				1D70442026FEA86400FFD44F /* AppDelegate.swift in Sources */,
 				1D70443926FEB6F700FFD44F /* SearchResult.swift in Sources */,
 				1D70442226FEA86400FFD44F /* SceneDelegate.swift in Sources */,

@@ -131,13 +131,15 @@ class SearchViewController: UIViewController {
         }
     }
     
-    //This method is the transition for when you flip to landscape mode
+    //This method is the transition for when you flip to landscape mode.
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
         super.willTransition(to: newCollection, with: coordinator)
         
         switch newCollection.verticalSizeClass {
         case .compact:
-            showLandscape(with: coordinator)
+            if newCollection.horizontalSizeClass == .compact {
+            showLandscape(with: coordinator) //This shows a proper split screen in larger iPhone screens
+            }
         case .regular, .unspecified:
             hideLandscape(with: coordinator)
         @unknown default:
