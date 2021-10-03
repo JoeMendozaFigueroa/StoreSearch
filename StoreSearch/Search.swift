@@ -10,26 +10,31 @@ import Foundation
 typealias SearchComplete = (Bool) -> Void
 
 class Search {
-    var searchResults: [SearchResult] = []
-    var hasSearched = false
-    var isLoading = false
+
+    enum State {
+        case notSearchedYet
+        case loading
+        case noResults
+        case results([SearchResult])
+    }
     
+    private(set) var state: State = .notSearchedYet
     private var dataTask: URLSessionDataTask?
     
     //This method shows the results from the search bar into the Table View Cell
-    func performSearch(for text: String, category: Int, completion: @escaping SearchComplete) {
+    func performSearch(for text: String, category: Category, completion: @escaping SearchComplete) {
         if !text.isEmpty {
             dataTask?.cancel()
-            
-            isLoading = true
-            hasSearched = true
-            searchResults = []
+
+            state = .loading
             
             let url = iTunesURL(searchText: text, category: category)
             
             let session = URLSession.shared
-            dataTask = session.dataTask(with: url, completionHandler: {
+            dataTask = session.dataTask(with: url) {
                 data, response, error in
+                
+                var newState = State.notSearchedYet
                 var success = false
                 //WAS THE SEARCH CANCELLED?
                 if let error = error as NSError?, error.code == -999 {
@@ -38,35 +43,28 @@ class Search {
                 
                 if let httpResponse = response as? HTTPURLResponse,
                    httpResponse.statusCode == 200, let data = data {
-                    self.searchResults = self.parse(data: data)
-                    self.searchResults.sort(by: <)
-                    
-                    print("Success!")
-                    self.isLoading = false
+                    var searchResults = self.parse(data: data)
+                    if searchResults.isEmpty {
+                        newState = .noResults
+                    } else {
+                        searchResults.sort(by: <)
+                        newState = .results(searchResults)
+                    }
                     success = true
                 }
-                
-                if !success {
-                    self.hasSearched = false
-                    self.isLoading = false
-                }
+
                 DispatchQueue.main.async {
+                    self.state = newState
                     completion(success)
                 }
-            })
+            }
             dataTask?.resume()
         }
     }
     //MARK: - HELPER METHODS
     //This method reads from the ITunes URL
-    private func iTunesURL(searchText: String, category: Int) -> URL {
-        let kind: String
-        switch category {
-        case 1: kind = "musicTrack"
-        case 2: kind = "software"
-        case 3: kind = "ebook"
-        default: kind = ""
-        }
+    private func iTunesURL(searchText: String, category: Category) -> URL {
+        let kind = category.type
         let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
         let urlString = "https://itunes.apple.com/search?" + "term=\(encodedText)&limit=200&entity=\(kind)"
         
@@ -86,4 +84,20 @@ class Search {
         }
     }
     
+    //This creates a new enumeration type Category
+    enum Category: Int {
+        case all = 0
+        case music = 1
+        case software = 2
+        case ebooks = 3
+        
+        var type: String {
+            switch self {
+            case .all: return ""
+            case .music: return "musicTrack"
+            case .software: return "software"
+            case .ebooks: return "ebook"
+            }
+        }
+    }
 }
