@@ -64,23 +64,11 @@ class LandscapeViewController: UIViewController {
         }
     }
     
-    //MARK: - ACTIONS
-    //This method allows the pageControl to be synched with the "tileButtons" Method
-    @IBAction func pageChanged(_ sender: UIPageControl) {
-        UIView.animate(
-            withDuration: 0.3,
-            delay: 0,
-            options: [.curveEaseInOut],
-            animations: {self.scrollView.contentOffset = CGPoint(
-                        x: self.scrollView.bounds.size.width * CGFloat(sender.currentPage),
-                        y: 0)
-            },
-        completion: nil)
-    }
-    
-    //This method show the detail view controlelr
-    @objc func buttonPressed(_ sender: UIButton) {
-        performSegue(withIdentifier: "ShowDetail", sender: sender)
+    deinit {
+        print("deinit \(self)")
+        for task in downloads {
+            task.cancel()
+        }
     }
     
     //MARK: - NAVIGATION
@@ -95,6 +83,39 @@ class LandscapeViewController: UIViewController {
             }
         }
     }
+    
+    //MARK: - ACTIONS
+    //This method allows the pageControl to be synched with the "tileButtons" Method
+    @IBAction func pageChanged(_ sender: UIPageControl) {
+        UIView.animate(
+            withDuration: 0.3,
+            delay: 0,
+            options: [.curveEaseInOut],
+            animations: {
+                self.scrollView.contentOffset = CGPoint(
+                    x: self.scrollView.bounds.size.width * CGFloat(sender.currentPage),
+                    y: 0)
+            },
+        completion: nil)
+    }
+    
+    //This method show the detail view controlelr
+    @objc func buttonPressed(_ sender: UIButton) {
+        performSegue(withIdentifier: "ShowDetail", sender: sender)
+    }
+    
+    //MARK: - HELPER METHODS
+    func searchResultsReceived() {
+        hideSpinner()
+        
+        switch search.state {
+        case .notSearchedYet, .loading, .noResults:
+            break
+        case .results(let list):
+            tileButtons(list)
+        }
+    }
+
     //MARK: - PRIVATE METHODS
     //This method is for the design and layout of the buttons
     private func tileButtons(_ searchResults: [SearchResult]) {
@@ -104,6 +125,7 @@ class LandscapeViewController: UIViewController {
         var rowsPerPage = 0
         var marginX: CGFloat = 0
         var marginY: CGFloat = 0
+        
         let viewWidth = UIScreen.main.bounds.size.width
         let viewHeight = UIScreen.main.bounds.size.height
         //1
@@ -156,11 +178,11 @@ class LandscapeViewController: UIViewController {
         let numPages = 1 + (searchResults.count - 1) / buttonsPerPage
         scrollView.contentSize = CGSize(
             width: CGFloat(numPages) * viewWidth, height: scrollView.bounds.size.height)
-        
+        print("Number of pages: \(numPages)")
+
         pageControl.numberOfPages = numPages
         pageControl.currentPage = 0
         
-        print("Number of pages: \(numPages)")
     }
     
     //This method downloads the image from the URL Search, to populate the "LandscapeButton"
@@ -196,6 +218,11 @@ class LandscapeViewController: UIViewController {
         spinner.startAnimating()
     }
     
+    //This method hides the spinner icon
+    private func hideSpinner() {
+        view.viewWithTag(1000)?.removeFromSuperview()
+    }
+    
     //This method is for when a users search results in nothing
     private func showNothingFoundLabel() {
         let label = UILabel(frame: CGRect.zero)
@@ -215,31 +242,6 @@ class LandscapeViewController: UIViewController {
             y: scrollView.bounds.midY)
         view.addSubview(label)
     }
-    
-    deinit {
-        print("deinit \(self)")
-        for task in downloads {
-            task.cancel()
-        }
-    }
-    
-    //MARK: - HELPER METHODS
-    func searchResultsReceived() {
-        hideSpinner()
-        
-        switch search.state {
-        case .notSearchedYet, .loading, .noResults:
-            break
-        case .results(let list):
-            tileButtons(list)
-        }
-    }
-    
-    //This method hides the spinner icon
-    private func hideSpinner() {
-        view.viewWithTag(1000)?.removeFromSuperview()
-    }
-
 }
 extension LandscapeViewController: UIScrollViewDelegate {
     //This method is for the scrolling area

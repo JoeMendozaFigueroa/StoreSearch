@@ -7,11 +7,13 @@
 
 import UIKit
 
-class MenuViewController: UITableViewController {
+protocol MenuViewControllerDelegate: class {
+    func menuViewControllerSendEmail(_ controller: MenuViewController)
+}
 
+class MenuViewController: UITableViewController {
     weak var delegate: MenuViewControllerDelegate?
-    
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -24,8 +26,5 @@ class MenuViewController: UITableViewController {
             delegate?.menuViewControllerSendEmail(self)
         }
     }
+}
 
-}
-protocol MenuViewControllerDelegate: class {
-    func menuViewControllerSendEmail(_ controller: MenuViewController)
-}

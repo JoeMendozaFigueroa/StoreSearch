@@ -15,7 +15,6 @@ class SearchViewController: UIViewController {
     
     private let search = Search()
     var landscapeVC: LandscapeViewController?
-    
     weak var splitViewDetail: DetailViewController?
 
     //*/This method subtitutes the tableView cell with the custom ".XIB" files*/
@@ -48,6 +47,43 @@ class SearchViewController: UIViewController {
         title = NSLocalizedString("Search", comment: "split view primary button")
     }
     
+    //This method will hide the navigation bar on the iPhone
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            navigationController?.navigationBar.isHidden = true
+        }
+    }
+    
+    //This method is the transition for when you flip to landscape mode.
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+        
+        switch newCollection.verticalSizeClass {
+        case .compact:
+            if newCollection.horizontalSizeClass == .compact {
+            showLandscape(with: coordinator) //This shows a proper split screen in larger iPhone screens
+            }
+        case .regular, .unspecified:
+            hideLandscape(with: coordinator)
+        @unknown default:
+            break
+        }
+    }
+    //MARK: - NAVIGATION
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowDetail" {
+            //These constants populate the labels wit the information from the URL search
+            if case .results(let list) = search.state {
+                let detailViewController = segue.destination as!
+                DetailViewController
+                let indexPath = sender  as! IndexPath
+                let searchResult = list[indexPath.row]
+                detailViewController.searchResult = searchResult
+                detailViewController.isPopup = true
+            }
+        }
+    }
     //MARK: - ACTIONS
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
         performSearch()
@@ -88,7 +124,8 @@ class SearchViewController: UIViewController {
                 }
             }, completion: {_ in controller.didMove(toParent: self)
                 
-            })
+                }
+            )
         }
     }
     //This method occurs when user places phone back to vertical mode & Landscape view controller disappears
@@ -102,7 +139,8 @@ class SearchViewController: UIViewController {
                 controller.view.removeFromSuperview()
                 controller.removeFromParent()
                 self.landscapeVC = nil
-            })
+                }
+            )
         }
     }
     
@@ -115,46 +153,6 @@ class SearchViewController: UIViewController {
             }
         )
     }
-    
-    //MARK: - NAVIGATION
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowDetail" {
-            //These constants populate the labels wit the information from the URL search
-            if case .results(let list) = search.state {
-                let detailViewController = segue.destination as!
-                DetailViewController
-                let indexPath = sender  as! IndexPath
-                let searchResult = list[indexPath.row]
-                detailViewController.searchResult = searchResult
-                detailViewController.isPopup = true
-            }
-        }
-    }
-    
-    //This method is the transition for when you flip to landscape mode.
-    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.willTransition(to: newCollection, with: coordinator)
-        
-        switch newCollection.verticalSizeClass {
-        case .compact:
-            if newCollection.horizontalSizeClass == .compact {
-            showLandscape(with: coordinator) //This shows a proper split screen in larger iPhone screens
-            }
-        case .regular, .unspecified:
-            hideLandscape(with: coordinator)
-        @unknown default:
-            break
-        }
-    }
-    
-    //This method will hide the navigation bar on the iPhone
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            navigationController?.navigationBar.isHidden = true
-        }
-    }
-
 }
 //MARK: - SEARCH BAR DELEGATE
 extension SearchViewController: UISearchBarDelegate {
@@ -174,17 +172,15 @@ extension SearchViewController: UISearchBarDelegate {
                 self.showNetworkError()
             }
             self.tableView.reloadData()
+            self.landscapeVC?.searchResultsReceived()
         }
-        
         tableView.reloadData()
         searchBar.resignFirstResponder()
-        self.landscapeVC?.searchResultsReceived()
     }
-    
     
     //*/This method extends the layout of the search bar to the top*/
     func position(for bar: UIBarPositioning) -> UIBarPosition {
-        return .topAttached
+        .topAttached
         }
     }
 }
@@ -212,20 +208,17 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
             fatalError("Should never get here")
             
         case .loading:
-            let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.loadingCell,
-                                                     for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.loadingCell, for: indexPath)
             
             let spinner = cell.viewWithTag(100) as! UIActivityIndicatorView
             spinner.startAnimating()
             return cell
             
         case .noResults:
-            return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell,
-                                                 for: indexPath)
+            return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell, for: indexPath)
             
         case .results(let list):
-            let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.searchResultCell,
-                                                     for: indexPath) as! SearchResultCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
             
             let searchResult = list[indexPath.row]
             cell.configure(for: searchResult)

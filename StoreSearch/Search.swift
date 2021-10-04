@@ -10,7 +10,24 @@ import Foundation
 typealias SearchComplete = (Bool) -> Void
 
 class Search {
-
+    
+    //This creates a new enumeration type Category
+    enum Category: Int {
+        case all = 0
+        case music = 1
+        case software = 2
+        case ebooks = 3
+        
+        var type: String {
+            switch self {
+            case .all: return ""
+            case .music: return "musicTrack"
+            case .software: return "software"
+            case .ebooks: return "ebook"
+            }
+        }
+    }
+    
     enum State {
         case notSearchedYet
         case loading
@@ -20,6 +37,8 @@ class Search {
     
     private(set) var state: State = .notSearchedYet
     private var dataTask: URLSessionDataTask?
+    
+    //MARK: - HELPER METHODS
     
     //This method shows the results from the search bar into the Table View Cell
     func performSearch(for text: String, category: Category, completion: @escaping SearchComplete) {
@@ -61,14 +80,22 @@ class Search {
             dataTask?.resume()
         }
     }
-    //MARK: - HELPER METHODS
+    //MARK: - PRIVATE METHODS
+    
     //This method reads from the ITunes URL
     private func iTunesURL(searchText: String, category: Category) -> URL {
+        let locale = Locale.autoupdatingCurrent
+        let language = locale.identifier
+        let countryCode = locale.regionCode ?? "en_US"
+        
         let kind = category.type
         let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
-        let urlString = "https://itunes.apple.com/search?" + "term=\(encodedText)&limit=200&entity=\(kind)"
+        let urlString =
+            "https://itunes.apple.com/search?" + "term=\(encodedText)&limit=200&entity=\(kind)" +
+            "&lang=\(language)&country=\(countryCode)"
         
         let url = URL(string: urlString)
+        print("URL: \(url!)")
         return url!
     }
     
@@ -84,20 +111,5 @@ class Search {
         }
     }
     
-    //This creates a new enumeration type Category
-    enum Category: Int {
-        case all = 0
-        case music = 1
-        case software = 2
-        case ebooks = 3
-        
-        var type: String {
-            switch self {
-            case .all: return ""
-            case .music: return "musicTrack"
-            case .software: return "software"
-            case .ebooks: return "ebook"
-            }
-        }
-    }
+
 }
