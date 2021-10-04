@@ -20,6 +20,7 @@ class LandscapeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //These constraints are initiated, to "override" auto layout constraints, to be able to build own layout
+        
         //Remove constraints from main view
         view.removeConstraints(view.constraints)
         view.translatesAutoresizingMaskIntoConstraints = true

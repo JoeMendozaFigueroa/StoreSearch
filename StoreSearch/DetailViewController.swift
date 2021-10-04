@@ -34,7 +34,7 @@ class DetailViewController: UIViewController {
             }
         }
     }
-    //This init method is called when the animation is needed
+    //This init method is for the transition
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         transitioningDelegate = self
@@ -45,7 +45,6 @@ class DetailViewController: UIViewController {
         if isPopup {
             popupView.layer.cornerRadius = 10 // This makes the edges of the pop-up view rounded with a radius of 10 Degrees
 
-            //This constant is for when a user touches outside of the Pop-Up View, it exits out of it
             let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(close))
             gestureRecognizer.cancelsTouchesInView = false
             gestureRecognizer.delegate = self

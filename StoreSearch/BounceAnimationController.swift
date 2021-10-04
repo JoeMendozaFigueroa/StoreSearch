@@ -7,6 +7,7 @@
 
 import UIKit
 
+//This is the class for the bounce action
 class BounceAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.4
@@ -20,6 +21,7 @@ class BounceAnimationController: NSObject, UIViewControllerAnimatedTransitioning
             containerView.addSubview(toView)
             toView.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
             
+            //This section are the keyframes for the bounce animation
             UIView.animateKeyframes(withDuration: transitionDuration(using: transitionContext), delay: 0, options: .calculationModeCubic, animations: {UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.334) {
                 toView.transform = CGAffineTransform (
                     scaleX: 1.2, y: 1.2)

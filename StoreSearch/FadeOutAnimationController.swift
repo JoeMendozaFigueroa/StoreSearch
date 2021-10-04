@@ -7,6 +7,7 @@
 
 import UIKit
 
+//This is the class for fade out the Detail View
 class FadeOutAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
     func transitionDuration(
         using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
